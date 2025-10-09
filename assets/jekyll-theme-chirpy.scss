@@ -1,0 +1,22 @@
+---
+---
+@import "jekyll-theme-chirpy";
+
+/* RTL tweaks */
+html { direction: rtl; }
+
+#sidebar { left: auto; right: 0; }
+
+main, #main, .page, .post, .content {
+  margin-left: 0 !important;
+  margin-right: var(--sidebar-width, 18rem) !important;
+}
+
+.sidebar .site-title,
+.sidebar .site-subtitle { text-align: right; }
+
+#search-wrapper input[type="search"] { text-align: right; }
+
+@media (max-width: 1199px) {
+  main, #main, .page, .post, .content { margin-right: 0 !important; }
+}
