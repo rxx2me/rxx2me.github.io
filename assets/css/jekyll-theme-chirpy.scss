@@ -2,25 +2,22 @@
 ---
 @import "jekyll-theme-chirpy";
 
-/* تفعيل اتجاه RTL عام */
+/* RTL tweaks */
 html { direction: rtl; }
 
-/* نقل السايدبار لليمين */
+/* ضع التخصيصات بعدها فقط */
 #sidebar { left: auto; right: 0; }
 
-/* إزاحة المحتوى ليصير فراغ السايدبار من اليمين بدل اليسار */
 main, #main, .page, .post, .content {
   margin-left: 0 !important;
-  margin-right: var(--sidebar-width, 18rem) !important; /* 18rem كقيمة احتياطية */
+  margin-right: var(--sidebar-width, 18rem) !important;
 }
 
-/* تحسينات بسيطة للواجهة العربية */
 .sidebar .site-title,
 .sidebar .site-subtitle { text-align: right; }
 
 #search-wrapper input[type="search"] { text-align: right; }
 
-/* على الشاشات الصغيرة خَلِّ المحتوى بعرض كامل */
 @media (max-width: 1199px) {
   main, #main, .page, .post, .content {
     margin-right: 0 !important;
