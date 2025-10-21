@@ -11,25 +11,20 @@ layout: default
   {%- assign cat = cat | first | downcase -%}
   {%- assign badge = post.cat_image | default: site.data.category_badges[cat] -%}
 
-  <!-- عدّل --badge و --gap حسب رغبتك -->
-  <article class="post-preview"
-           style="--badge: 90px; --gap: 14px;
-                  position: relative;
-                  padding-block: 16px;                 /* مسافة فوق/تحت */
-                  min-height: calc(var(--badge) + 32px) /* يضمن التوسيط العمودي */;
-           ">
-    <h1 class="post-title" style="margin: 0 0 .5rem 0;">
+  <article class="post-preview" style="position:relative;">
+    <!-- نخلي الهيدر بدون هوامش إضافية -->
+    <h1 class="post-title" style="margin:0 0 .5rem 0;">
+      <!-- صف العنوان: Flex بسيط، توسيط عمودي، ومسافة واضحة -->
       <div class="post-title-wrap"
-           style="display:grid;grid-template-columns:var(--badge) 1fr;
-                  align-items:center;column-gap:var(--gap)">
+           style="display:flex;align-items:center;gap:12px;direction:inherit;">
         {%- if badge -%}
-          <span class="cat-badge"
-                style="inline-size:var(--badge);block-size:var(--badge);
-                       border-radius:12px;display:inline-block;
-                       background-image:url('{{ badge | relative_url }}');
-                       background-size:cover;background-position:center;
-                       background-repeat:no-repeat;
-                       align-self:center;justify-self:center;">
+          <!-- الأيقونة كخلفية داخل عنصر ثابت المقاس -->
+          <span
+            class="cat-badge"
+            style="width:64px;height:64px;border-radius:12px;
+                   display:inline-block;flex:0 0 64px;
+                   background-image:url('{{ badge | relative_url }}');
+                   background-size:cover;background-position:center;background-repeat:no-repeat;">
           </span>
         {%- endif -%}
         <span class="post-title-text">{{ post.title | escape }}</span>
@@ -37,14 +32,12 @@ layout: default
     </h1>
 
     {%- if post.excerpt -%}
-    <div class="post-excerpt"
-         style="margin-inline-start: calc(var(--badge) + var(--gap));">
+    <div class="post-excerpt">
       {{ post.excerpt | strip_html | truncate: 160 }}
     </div>
     {%- endif -%}
 
-    <div class="post-meta"
-         style="margin-inline-start: calc(var(--badge) + var(--gap));">
+    <div class="post-meta">
       <span class="post-date">{{ post.date | date: df }}</span>
       {%- if post.categories and post.categories != empty -%}
         <span class="post-cat"> •
@@ -60,7 +53,7 @@ layout: default
     <a class="post-link"
        href="{{ post.url | relative_url }}"
        aria-label="{{ post.title | escape }}"
-       style="position:absolute; inset:0;"></a>
+       style="position:absolute;inset:0;"></a>
   </article>
 {%- endfor -%}
 </div>
