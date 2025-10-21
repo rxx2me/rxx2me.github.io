@@ -11,15 +11,25 @@ layout: default
   {%- assign cat = cat | first | downcase -%}
   {%- assign badge = post.cat_image | default: site.data.category_badges[cat] -%}
 
-  <!-- عدّل --badge و --gap حسب ما تحب -->
-  <article class="post-preview" style="--badge: 80px; --gap: 14px; position: relative;">
-    <h1 class="post-title">
+  <!-- عدّل --badge و --gap حسب رغبتك -->
+  <article class="post-preview"
+           style="--badge: 90px; --gap: 14px;
+                  position: relative;
+                  padding-block: 16px;                 /* مسافة فوق/تحت */
+                  min-height: calc(var(--badge) + 32px) /* يضمن التوسيط العمودي */;
+           ">
+    <h1 class="post-title" style="margin: 0 0 .5rem 0;">
       <div class="post-title-wrap"
-           style="display:grid;grid-template-columns:var(--badge) 1fr;align-items:center;column-gap:var(--gap)">
+           style="display:grid;grid-template-columns:var(--badge) 1fr;
+                  align-items:center;column-gap:var(--gap)">
         {%- if badge -%}
-          <span
-            class="cat-badge"
-            style="inline-size:var(--badge);block-size:var(--badge);border-radius:12px;display:inline-block;background-image:url('{{ badge | relative_url }}');background-size:cover;background-position:center;background-repeat:no-repeat;flex:0 0 var(--badge);">
+          <span class="cat-badge"
+                style="inline-size:var(--badge);block-size:var(--badge);
+                       border-radius:12px;display:inline-block;
+                       background-image:url('{{ badge | relative_url }}');
+                       background-size:cover;background-position:center;
+                       background-repeat:no-repeat;
+                       align-self:center;justify-self:center;">
           </span>
         {%- endif -%}
         <span class="post-title-text">{{ post.title | escape }}</span>
