@@ -13,14 +13,19 @@ layout: default
 
   <article class="post-preview">
     <h1 class="post-title">
-      <a class="post-title-wrap" href="{{ post.url | relative_url }}">
+      <a class="post-title-wrap"
+         href="{{ post.url | relative_url }}"
+         style="display:inline-flex;align-items:center;gap:.5rem">
         {%- if badge -%}
-          <img class="cat-badge"
-               src="{{ badge | relative_url }}"
-               alt="{{ cat | escape }}"
-               loading="lazy"
-               decoding="async"
-               width="28" height="28">
+          <span class="cat-badge-wrap" style="display:inline-flex">
+            <img class="cat-badge"
+                 src="{{ badge | relative_url }}"
+                 alt="{{ cat | escape }}"
+                 loading="lazy"
+                 decoding="async"
+                 width="28" height="28"
+                 style="width:28px;height:28px;max-width:28px;max-height:28px;display:inline-block;vertical-align:middle;object-fit:contain;border-radius:8px;">
+          </span>
         {%- endif -%}
         <span class="post-title-text">{{ post.title | escape }}</span>
       </a>
