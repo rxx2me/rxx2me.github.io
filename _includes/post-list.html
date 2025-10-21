@@ -7,7 +7,8 @@ Works with Chirpy even لو تغيّر إصدار الثيم
 {%- if posts and posts != empty -%}
   <div class="post-list">
   {%- for post in posts -%}
-    {%- assign cat = post.categories | first | downcase -%}
+    {%- assign cat = post.categorie | default: post.categories -%}
+    {%- assign cat = cat | first | downcase -%}
     {%- assign badge = post.cat_image | default: site.data.category_badges[cat] -%}
 
     <article class="post-preview">
