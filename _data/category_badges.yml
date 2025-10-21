@@ -1,0 +1,8 @@
+general:  "/assets/img/categories/general.svg"
+web:      "/assets/img/categories/web.svg"
+crypto:   "/assets/img/categories/crypto.svg"
+reversing: "/assets/img/categories/reversing.svg"
+forensics: "/assets/img/categories/forensics.svg"
+mobile: "/assets/img/categories/mobile.svg"
+pwn: "/assets/img/categories/pwn.svg"
+misc: "/assets/img/categories/misc.svg"
