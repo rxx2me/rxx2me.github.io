@@ -1,26 +1,26 @@
-/* === Fix: category icon should be small, inline with the title === */
-.post-preview .post-title .post-title-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-}
+---
+---
 
-/* قوّة اختيار أعلى + !important لإلغاء width:100% من الثيم */
-.post-preview .post-title img.cat-badge {
+@import "jekyll-theme-chirpy";
+
+/* === Category icon tweaks === */
+.post-preview h1.post-title a.post-title-wrap > img.cat-badge {
   width: 28px !important;
   height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
   display: inline-block !important;
-  flex: 0 0 28px;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-inline-end: .5rem;
-  vertical-align: middle;
-  box-shadow: none; /* احتياط لو الثيم يطبّق ظل */
-  border: 0;
-  padding: 0;
+  vertical-align: middle !important;
+  object-fit: contain !important;
+  margin-inline-end: .5rem !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
-/* منع أي قاعدة عامة على صور العنوان */
-.post-preview .post-title img {
-  max-width: none !important;
+/* تأكيد أن رابطة العنوان تصطف بشكل أفقي */
+.post-preview h1.post-title a.post-title-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .5rem !important;
 }
