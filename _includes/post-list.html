@@ -1,0 +1,48 @@
+{%- comment -%}
+Drop-in post list with category badge icon next to title
+Works with Chirpy even لو تغيّر إصدار الثيم
+{%- endcomment -%}
+
+{%- assign posts = paginator.posts | default: site.posts -%}
+{%- if posts and posts != empty -%}
+  <div class="post-list">
+  {%- for post in posts -%}
+    {%- assign cat = post.categories | first | downcase -%}
+    {%- assign badge = post.cat_image | default: site.data.category_badges[cat] -%}
+
+    <article class="post-preview">
+      <h1 class="post-title">
+        <a class="post-title-wrap" href="{{ post.url | relative_url }}">
+          {%- if badge -%}
+          <img class="cat-badge" src="{{ badge | relative_url }}" alt="{{ cat | escape }}" loading="lazy" decoding="async" width="28" height="28">
+          {%- endif -%}
+          <span class="post-title-text">{{ post.title | escape }}</span>
+        </a>
+      </h1>
+
+      {%- if post.excerpt -%}
+      <div class="post-excerpt">
+        {{ post.excerpt | strip_html | truncate: 160 }}
+      </div>
+      {%- endif -%}
+
+      <div class="post-meta">
+        <span class="post-date">{{ post.date | date: site.data.locales[site.lang].df_post }}</span>
+        {%- if post.categories and post.categories != empty -%}
+        <span class="post-cat"> •
+          {%- for c in post.categories -%}
+            <a href="{{ '/categories/' | append: c | relative_url }}">{{ c }}</a>{% unless forloop.last %}, {% endunless %}
+          {%- endfor -%}
+        </span>
+        {%- endif -%}
+      </div>
+    </article>
+  {%- endfor -%}
+  </div>
+
+  {%- if paginator.total_pages and paginator.total_pages > 1 -%}
+    {%- include paginator.html -%}
+  {%- endif -%}
+{%- else -%}
+  <p>No posts yet.</p>
+{%- endif -%}
