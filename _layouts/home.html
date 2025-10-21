@@ -34,11 +34,12 @@ layout: default
 
     <div class="post-meta">
       <span class="post-date">{{ post.date | date: df }}</span>
+
       {%- if post.categories and post.categories != empty -%}
         <span class="post-cat"> •
           {%- for c in post.categories -%}
             {%- assign slug = c | slugify -%}
-            <a href="{{ '/categories/#' | append: slug | relative_url }}">{{ c }}</a>{% unless forloop.last %}, {% endunless %}
+            <a href="{{ '/categories/' | append: slug | append: '/' | relative_url }}">{{ c }}</a>{% unless forloop.last %}, {% endunless %}
           {%- endfor -%}
         </span>
       {%- endif -%}
