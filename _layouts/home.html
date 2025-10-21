@@ -3,21 +3,47 @@ layout: default
 ---
 
 {%- comment -%}
-CSS محلي خفيف: أيقونة التصنيف كخلفية، بدون <img> نهائيًا
+تنسيق محلي:
+- عمود للأيقونة + عمود للنص باستخدام CSS Grid
+- مقاسات قابلة للتعديل عبر المتغيرات --badge و --gap
+- يعمل مع RTL/LTR بدون ما نخرب ستايل الثيم
 {%- endcomment -%}
 <style>
-/* ترتيب عنوان التدوينة مع الأيقونة */
+:root{
+  --badge: 72px;   /* حجم الأيقونة: غيّرها مثلاً إلى 64px أو 80px */
+  --gap:   12px;   /* المسافة بين الأيقونة والعنوان */
+}
+
+/* صف العنوان: عمود للأيقونة وعمود للنص */
 .post-title .post-title-wrap{
-  display:inline-flex;align-items:center;gap:.5rem
+  display: grid;
+  grid-template-columns: var(--badge) 1fr;
+  align-items: center;
+  column-gap: var(--gap);
+  text-decoration: none;
 }
-/* الأيقونة: خلفية قابلة للتغيير بالحجم */
+
+/* الأيقونة كخلفية بدون <img> */
 .cat-badge{
-  width:55px;height:55px;display:inline-block;border-radius:8px;
-  background-size:contain;background-repeat:no-repeat;background-position:center;
-  flex:0 0 55px;vertical-align:middle
+  inline-size: var(--badge);
+  block-size:  var(--badge);
+  display: inline-block;
+  border-radius: 12px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  /* منع تمدد داخل بطاقات الثيم */
+  flex: 0 0 var(--badge);
 }
-/* حماية إضافية: لا تسمح لأي صورة جوّا عنوان البوست تتمدّد (احتياط) */
-.post-preview .post-title img{max-width:55px;max-height:55px;display:inline-block}
+
+/* لو حاب تضيف مسافة خفيفة حول البطاقة من داخلها (اختياري) */
+/* .post-preview { padding: 6px 8px; } */
+
+/* ضمان أن أي صورة داخل العنوان ما تتمدد بالغلط (احتياط) */
+.post-preview .post-title img{
+  max-inline-size: var(--badge);
+  max-block-size:  var(--badge);
+}
 </style>
 
 {%- assign posts = paginator.posts | default: site.posts -%}
