@@ -2,6 +2,24 @@
 layout: default
 ---
 
+{%- comment -%}
+CSS محلي خفيف: أيقونة التصنيف كخلفية، بدون <img> نهائيًا
+{%- endcomment -%}
+<style>
+/* ترتيب عنوان التدوينة مع الأيقونة */
+.post-title .post-title-wrap{
+  display:inline-flex;align-items:center;gap:.5rem
+}
+/* الأيقونة: خلفية قابلة للتغيير بالحجم */
+.cat-badge{
+  width:28px;height:28px;display:inline-block;border-radius:8px;
+  background-size:contain;background-repeat:no-repeat;background-position:center;
+  flex:0 0 28px;vertical-align:middle
+}
+/* حماية إضافية: لا تسمح لأي صورة جوّا عنوان البوست تتمدّد (احتياط) */
+.post-preview .post-title img{max-width:28px;max-height:28px;display:inline-block}
+</style>
+
 {%- assign posts = paginator.posts | default: site.posts -%}
 {%- assign df = site.data.locales[site.lang].df_post | default: "%Y-%m-%d" -%}
 
@@ -13,19 +31,9 @@ layout: default
 
   <article class="post-preview">
     <h1 class="post-title">
-      <a class="post-title-wrap"
-         href="{{ post.url | relative_url }}"
-         style="display:inline-flex;align-items:center;gap:.5rem">
+      <a class="post-title-wrap" href="{{ post.url | relative_url }}">
         {%- if badge -%}
-          <span class="cat-badge-wrap" style="display:inline-flex">
-            <img class="cat-badge"
-                 src="{{ badge | relative_url }}"
-                 alt="{{ cat | escape }}"
-                 loading="lazy"
-                 decoding="async"
-                 width="28" height="28"
-                 style="width:28px;height:28px;max-width:28px;max-height:28px;display:inline-block;vertical-align:middle;object-fit:contain;border-radius:8px;">
-          </span>
+          <span class="cat-badge" style="background-image:url('{{ badge | relative_url }}')"></span>
         {%- endif -%}
         <span class="post-title-text">{{ post.title | escape }}</span>
       </a>
@@ -39,7 +47,6 @@ layout: default
 
     <div class="post-meta">
       <span class="post-date">{{ post.date | date: df }}</span>
-
       {%- if post.categories and post.categories != empty -%}
         <span class="post-cat"> •
           {%- for c in post.categories -%}
