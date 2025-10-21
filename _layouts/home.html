@@ -12,11 +12,10 @@ layout: default
   {%- assign badge = post.cat_image | default: site.data.category_badges[cat] -%}
 
   <!-- عدّل --badge و --gap حسب ما تحب -->
-  <article class="post-preview" style="--badge: 80px; --gap: 14px;">
+  <article class="post-preview" style="--badge: 80px; --gap: 14px; position: relative;">
     <h1 class="post-title">
-      <a class="post-title-wrap"
-         href="{{ post.url | relative_url }}"
-         style="display:grid;grid-template-columns:var(--badge) 1fr;align-items:center;column-gap:var(--gap);text-decoration:none">
+      <div class="post-title-wrap"
+           style="display:grid;grid-template-columns:var(--badge) 1fr;align-items:center;column-gap:var(--gap)">
         {%- if badge -%}
           <span
             class="cat-badge"
@@ -24,7 +23,7 @@ layout: default
           </span>
         {%- endif -%}
         <span class="post-title-text">{{ post.title | escape }}</span>
-      </a>
+      </div>
     </h1>
 
     {%- if post.excerpt -%}
@@ -46,6 +45,12 @@ layout: default
         </span>
       {%- endif -%}
     </div>
+
+    <!-- رابط يغطي البطاقة كلها (سلوك Chirpy القياسي) -->
+    <a class="post-link"
+       href="{{ post.url | relative_url }}"
+       aria-label="{{ post.title | escape }}"
+       style="position:absolute; inset:0;"></a>
   </article>
 {%- endfor -%}
 </div>
