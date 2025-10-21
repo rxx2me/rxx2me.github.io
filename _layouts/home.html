@@ -11,20 +11,15 @@ layout: default
   {%- assign cat = cat | first | downcase -%}
   {%- assign badge = post.cat_image | default: site.data.category_badges[cat] -%}
 
-  <article class="post-preview" style="position:relative;">
-    <!-- نخلي الهيدر بدون هوامش إضافية -->
-    <h1 class="post-title" style="margin:0 0 .5rem 0;">
-      <!-- صف العنوان: Flex بسيط، توسيط عمودي، ومسافة واضحة -->
+  <!-- عدّل --badge و --gap حسب ما تحب -->
+  <article class="post-preview" style="--badge: 96px; --gap: 14px; position: relative;">
+    <h1 class="post-title">
       <div class="post-title-wrap"
-           style="display:flex;align-items:center;gap:12px;direction:inherit;">
+           style="display:grid;grid-template-columns:var(--badge) 1fr;align-items:center;column-gap:var(--gap)">
         {%- if badge -%}
-          <!-- الأيقونة كخلفية داخل عنصر ثابت المقاس -->
           <span
             class="cat-badge"
-            style="width:64px;height:64px;border-radius:12px;
-                   display:inline-block;flex:0 0 64px;
-                   background-image:url('{{ badge | relative_url }}');
-                   background-size:cover;background-position:center;background-repeat:no-repeat;">
+            style="inline-size:var(--badge);block-size:var(--badge);border-radius:12px;display:inline-block;background-image:url('{{ badge | relative_url }}');background-size:cover;background-position:center;background-repeat:no-repeat;flex:0 0 var(--badge);">
           </span>
         {%- endif -%}
         <span class="post-title-text">{{ post.title | escape }}</span>
@@ -32,12 +27,14 @@ layout: default
     </h1>
 
     {%- if post.excerpt -%}
-    <div class="post-excerpt">
+    <div class="post-excerpt"
+         style="margin-inline-start: calc(var(--badge) + var(--gap));">
       {{ post.excerpt | strip_html | truncate: 160 }}
     </div>
     {%- endif -%}
 
-    <div class="post-meta">
+    <div class="post-meta"
+         style="margin-inline-start: calc(var(--badge) + var(--gap));">
       <span class="post-date">{{ post.date | date: df }}</span>
       {%- if post.categories and post.categories != empty -%}
         <span class="post-cat"> •
@@ -53,7 +50,7 @@ layout: default
     <a class="post-link"
        href="{{ post.url | relative_url }}"
        aria-label="{{ post.title | escape }}"
-       style="position:absolute;inset:0;"></a>
+       style="position:absolute; inset:0;"></a>
   </article>
 {%- endfor -%}
 </div>
