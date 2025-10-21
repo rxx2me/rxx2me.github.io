@@ -1,0 +1,13 @@
+/* === Category badge next to post title === */
+.post-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+.cat-badge {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  object-fit: contain;
+  flex-shrink: 0;
+  opacity: .95;
+}
