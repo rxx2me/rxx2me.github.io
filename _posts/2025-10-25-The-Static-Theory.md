@@ -22,15 +22,17 @@ image: /assets/img/categories/forensics.svg
 
 ## Intro
 
-This challenge hides data in **sound, not sight**. By converting the video’s audio to a WAV file and switching to a spectrogram view, text appears as a bright, narrow band around the high frequencies. 
-Read it like a banner to recover the flag.
+I pressed play and heard… nothing useful—just hiss and a few harsh bursts. Scrubbing the video frames didn’t help either. But the “noise” line in the prompt nagged at me. 
+So I stopped *listening* and started *looking* at the sound. The moment I flipped the audio into a spectrogram, a neon ribbon near the upper frequencies turned into letters. 
+That’s where the flag .
+
 
 ---
 
 ## Challenge Description
 
-We’re given a podcast teaser as an MP4. The audio looks like static, but the prompt hints that “noise” contains the answer. 
-This screams **spectrogram steganography**—render the frequency content over time and look for shapes or letters embedded in a thin frequency slice.
+We’re given a short podcast teaser as an MP4. At first pass it’s just broadband static—no melody, no clear tones, no obvious Morse. 
+But the clip is “drawn” to be seen rather than heard: the author etched text into a thin horizontal band around ~10 kHz so that the letters only show up when you visualize frequency. 
 
 ---
 
