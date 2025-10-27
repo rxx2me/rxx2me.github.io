@@ -8,4 +8,5 @@ order: 4
 {: .prompt-tip }
 
 
-![ctftime](/assets/file/about/ctftime.png){: width="80" height="40" }
+> ![ctftime](/assets/file/about/ctftime.png){: width="80" height="40" }
+{: .prompt-danger }
