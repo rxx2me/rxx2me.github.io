@@ -8,9 +8,19 @@ order: 4
 {: .prompt-tip }
 
 
-> <div style="display:flex; align-items:flex-start; gap:14px;">
->   <img src="/assets/file/about/ctftime.png"
->        alt="CTFtime" width="80" height="40"
+> <style>
+> 
+> .ctf-list a{
+>   color:#fff !important;            
+>   text-decoration:none;             
+>   box-shadow:none; border-bottom:0; 
+>   display:inline;                   
+> }
+> .ctf-list a:hover{ text-decoration:underline; }
+> </style>
+>
+> <div class="ctf-list" style="display:flex; align-items:flex-start; gap:14px;">
+>   <img src="/assets/file/about/ctftime.png" alt="CTFtime" width="80" height="40"
 >        style="flex:0 0 auto; object-fit:contain; border-radius:6px; margin-top:4px;">
 >   <div style="flex:1 1 auto;">
 >     <div style="font-weight:600; font-size:1rem; margin-bottom:8px;">My CTFtime</div>
@@ -27,5 +37,7 @@ order: 4
 >   </div>
 > </div>
 {: .prompt-danger }
+
+
 
 
