@@ -8,18 +8,26 @@ order: 4
 {: .prompt-tip }
 
 
-> <img src="/assets/file/about/ctftime.png"
->      alt="CTFtime" width="80" height="40"
->      style="float:left; margin:0 12px 8px 0;">
+> <div style="display:flex; align-items:flex-start; gap:14px;">
+>   <img src="/assets/file/about/ctftime.png"
+>        alt="CTFtime" width="80" height="40"
+>        style="flex:0 0 auto; object-fit:contain; border-radius:6px; margin-top:4px;">
+>   <div style="flex:1 1 auto;">
+>     <div style="font-weight:600; font-size:1rem; margin-bottom:8px;">CTFtime Teams</div>
+>     <div style="display:grid; grid-template-columns: 1fr auto; gap:8px 12px;">
+>       <a href="https://ctftime.org/team/397301">W4llz</a>
+>       <span style="padding:2px 10px; border-radius:999px; border:1px solid #ffffff2a; font-size:.85em;">Team</span>
 >
-> **CTFtime Teams**
+>       <a href="https://ctftime.org/team/20659">SOS</a>
+>       <span style="padding:2px 10px; border-radius:999px; border:1px solid #ffffff2a; font-size:.85em;">Duo</span>
 >
-> [W4llz](https://ctftime.org/team/397301) — Team
+>       >       <div style="grid-column:1/-1; height:10px;"></div>
 >
-> [SOS](https://ctftime.org/team/20659) — Duo
->
-> [Rxx2me](https://ctftime.org/team/300020) — Solo
->
-> <span style="display:block; clear:both;"></span>
+>       <a href="https://ctftime.org/team/300020">Rxx2me</a>
+>       <span style="padding:2px 10px; border-radius:999px; border:1px solid #ffffff2a; font-size:.85em;">Solo</span>
+>     </div>
+>   </div>
+> </div>
 {: .prompt-danger }
+
 
