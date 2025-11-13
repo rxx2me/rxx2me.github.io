@@ -12,6 +12,7 @@ image: /assets/img/categories/crypto.svg
 ---
 
 ![](/assets/file/writeup/cube_cipher/1.png) 
+
 # cube cipher 1
 
 > **Category:** Crypto  
