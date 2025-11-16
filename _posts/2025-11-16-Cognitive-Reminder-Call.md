@@ -64,7 +64,7 @@ Key observations:
 - Chose fresh nonce: `00112233`  
 - Forged tag (CRC32 over `nonce || parts_concat` combined with `CRC32(key)`): `f43f588e`  
 
-**nc session (trimmed):**
+**nc -v 10.80.16.59 1337:**
 ```
 Part 1 (hex): 517d2bcb
 Part 2 (hex): 9c0dd2d9
