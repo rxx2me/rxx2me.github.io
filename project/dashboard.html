@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MQTT-IoMT Anomaly Demo</title>
+  <style>
+    :root { --bg:#0b1020; --panel:#121a33; --text:#e7ecff; --muted:#aab3d6; --good:#35d07f; --warn:#ffcc66; --bad:#ff5c7a; }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+    body{margin:0;background:var(--bg);color:var(--text)}
+    header{padding:16px 18px;border-bottom:1px solid #24305e;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    header h1{margin:0;font-size:16px;font-weight:700;letter-spacing:.2px}
+    header .sub{font-size:12px;color:var(--muted)}
+    .wrap{display:grid;grid-template-columns: 360px 1fr;gap:14px;padding:14px}
+    .panel{background:var(--panel);border:1px solid #24305e;border-radius:14px;padding:12px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{border:1px solid #2b3a75;background:#0e1630;color:var(--text);padding:8px 10px;border-radius:10px;font-size:12px;cursor:pointer}
+    .btn.active{border-color:#5a77ff;box-shadow:0 0 0 2px rgba(90,119,255,.2) inset}
+    .kv{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted);margin-top:8px}
+    .kv b{color:var(--text);font-weight:700}
+    .devices{display:grid;gap:10px;margin-top:10px}
+    .card{border:1px solid #24305e;border-radius:14px;padding:10px;background:#0e1630}
+    .cardTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .name{font-weight:700;font-size:12px}
+    .meta{font-size:11px;color:var(--muted);margin-top:6px;display:grid;gap:4px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    canvas{width:100%;height:220px;background:#0e1630;border:1px solid #24305e;border-radius:14px}
+    .log{max-height:220px;overflow:auto;font-size:11px;line-height:1.4;color:var(--muted)}
+    .log .a{color:#d9e0ff}
+    .log .w{color:var(--warn)}
+    .log .b{color:var(--bad)}
+    .tag{font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid #24305e;color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MQTT Medical-IoT Simulation (Concept Dashboard)</h1>
+    <div class="sub">Shows normal behavior vs. intrusion phases using broker-log style events (no payload content).</div>
+  </div>
+  <div class="row">
+    <button class="btn active" data-mode="normal">Normal</button>
+    <button class="btn" data-mode="attackA">Attack A: Session Flood</button>
+    <button class="btn" data-mode="attackB">Attack B: Publish Flood</button>
+    <button class="btn" data-mode="attackC">Attack C: Unauthorized Access</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="panel">
+    <div class="row" style="align-items:center;justify-content:space-between">
+      <div class="tag" id="modeTag">MODE: NORMAL</div>
+      <div class="tag" id="wsTag">SOURCE: SIMULATOR</div>
+    </div>
+
+    <div class="kv"><span>Events / sec</span><b id="eps">0</b></div>
+    <div class="kv"><span>Connect rate / sec</span><b id="cps">0</b></div>
+    <div class="kv"><span>Auth failures / sec</span><b id="afs">0</b></div>
+    <div class="kv"><span>Anomaly score (0–1)</span><b id="score">0.00</b></div>
+
+    <div style="margin-top:12px;font-size:12px;font-weight:700">Devices</div>
+    <div class="devices" id="devices"></div>
+  </aside>
+
+  <main class="panel">
+    <div class="grid2">
+      <div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Activity (events/sec)</div>
+        <canvas id="chart1" width="900" height="300"></canvas>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Anomaly score</div>
+        <canvas id="chart2" width="900" height="300"></canvas>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;font-size:12px;font-weight:700;margin-bottom:8px">Live event feed</div>
+    <div class="panel" style="background:#0e1630" >
+      <div class="log" id="log"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Concept-only simulator. Replace `generateBatch()` with real broker-log ingestion from VM-04 via WebSocket.
+
+  const DEVICES = [
+    {id:"bedside-monitor-01", label:"Bedside Monitor", topicBase:"/icu/bed1/vitals"},
+    {id:"infusion-pump-02",   label:"Infusion Pump",  topicBase:"/icu/bed2/infusion"},
+    {id:"ventilator-01",      label:"Ventilator",     topicBase:"/icu/bed1/vent"},
+    {id:"wearable-07",        label:"Wearable",       topicBase:"/wb/athlete/hr"},
+    {id:"gateway-01",         label:"Ward Gateway",   topicBase:"/gw/telemetry"}
+  ];
+
+  const state = {
+    mode: "normal",
+    t0: Date.now(),
+    historyEps: Array(60).fill(0),
+    historyScore: Array(60).fill(0),
+    lastSecond: Math.floor(Date.now()/1000),
+    secCounters: {events:0, connects:0, authFails:0},
+    // simple rolling baseline for score (concept)
+    baseline: {epsMean: 18, epsStd: 6, authMean: 0.2, authStd: 0.5}
+  };
+
+  const els = {
+    devices: document.getElementById("devices"),
+    log: document.getElementById("log"),
+    modeTag: document.getElementById("modeTag"),
+    eps: document.getElementById("eps"),
+    cps: document.getElementById("cps"),
+    afs: document.getElementById("afs"),
+    score: document.getElementById("score"),
+    c1: document.getElementById("chart1"),
+    c2: document.getElementById("chart2")
+  };
+
+  function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+  function z(x, mean, std){ return std>1e-6 ? (x-mean)/std : 0; }
+  function nowIso(){ return new Date().toISOString().replace("T"," ").replace("Z",""); }
+
+  function setMode(mode){
+    state.mode = mode;
+    const label = mode==="normal" ? "NORMAL"
+      : mode==="attackA" ? "ATTACK A (SESSION FLOOD)"
+      : mode==="attackB" ? "ATTACK B (PUBLISH FLOOD)"
+      : "ATTACK C (UNAUTHORIZED ACCESS)";
+    els.modeTag.textContent = "MODE: " + label;
+    document.querySelectorAll(".btn").forEach(b => b.classList.toggle("active", b.dataset.mode===mode));
+  }
+
+  document.querySelectorAll(".btn").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+  function deviceHealthForMode(mode, devId){
+    if(mode==="normal") return {color:"var(--good)", status:"stable"};
+    if(mode==="attackA") return (devId.includes("gateway")) ? {color:"var(--warn)", status:"degraded"} : {color:"var(--warn)", status:"unstable sessions"};
+    if(mode==="attackB") return devId.includes("infusion") ? {color:"var(--bad)", status:"queueing"} : {color:"var(--warn)", status:"high load"};
+    return devId.includes("gateway") ? {color:"var(--bad)", status:"blocked topics"} : {color:"var(--warn)", status:"auth failures"};
+  }
+
+  function renderDevices(){
+    els.devices.innerHTML = "";
+    DEVICES.forEach(d => {
+      const h = deviceHealthForMode(state.mode, d.id);
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <div class="cardTop">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="dot" style="background:${h.color}"></div>
+            <div>
+              <div class="name">${d.label}</div>
+              <div class="sub" style="font-size:11px;color:var(--muted)">${d.id}</div>
+            </div>
+          </div>
+          <div class="tag">${h.status}</div>
+        </div>
+        <div class="meta">
+          <div>topic base: <span style="color:#d9e0ff">${d.topicBase}</span></div>
+          <div>last event: <span style="color:#d9e0ff" id="last-${d.id}">—</span></div>
+        </div>
+      `;
+      els.devices.appendChild(div);
+    });
+  }
+
+  function pushLog(line, cls){
+    const p = document.createElement("div");
+    p.className = cls || "a";
+    p.textContent = line;
+    els.log.appendChild(p);
+    while(els.log.childNodes.length > 140) els.log.removeChild(els.log.firstChild);
+    els.log.scrollTop = els.log.scrollHeight;
+  }
+
+  function drawSeries(canvas, series, yMax){
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+
+    // axes
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#24305e";
+    ctx.beginPath();
+    ctx.moveTo(40,10); ctx.lineTo(40,h-30); ctx.lineTo(w-10,h-30);
+    ctx.stroke();
+
+    // grid
+    ctx.globalAlpha = 0.6;
+    for(let i=0;i<4;i++){
+      const y = 10 + i*(h-40)/4;
+      ctx.beginPath(); ctx.moveTo(40,y); ctx.lineTo(w-10,y); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // series
+    const n = series.length;
+    const x0=40, x1=w-10, y0=10, y1=h-30;
+    ctx.strokeStyle = "#d9e0ff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const x = x0 + (i/(n-1))*(x1-x0);
+      const v = series[i];
+      const y = y1 - (clamp(v,0,yMax)/yMax)*(y1-y0);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // labels
+    ctx.fillStyle = "#aab3d6";
+    ctx.font = "12px system-ui";
+    ctx.fillText("t-60s", x0, h-10);
+    ctx.fillText("now", w-40, h-10);
+  }
+
+  function computeScore(eps, authFails){
+    // Concept score = squashed combination of z-scores.
+    const z1 = z(eps, state.baseline.epsMean, state.baseline.epsStd);
+    const z2 = z(authFails, state.baseline.authMean, state.baseline.authStd);
+    const raw = 0.55*z1 + 0.75*z2;
+    return clamp(1/(1+Math.exp(-raw)), 0, 1);
+  }
+
+  function genEvent(kind, dev, extra){
+    const base = {
+      ts: Date.now(),
+      iso: nowIso(),
+      clientId: dev.id,
+      kind, // CONNECT | PUBLISH | SUBSCRIBE | DISCONNECT | AUTH_FAIL
+      topic: dev.topicBase + "/t",
+      qos: (kind==="PUBLISH") ? (Math.random()<0.85?0:1) : 0,
+      payloadBytes: (kind==="PUBLISH") ? Math.floor(60 + Math.random()*140) : 0
+    };
+    return Object.assign(base, extra||{});
+  }
+
+  function generateBatch(){
+    // Determine intensity by mode (concept-only).
+    const mode = state.mode;
+
+    const baseEvents = 8 + Math.floor(Math.random()*6); // normal baseline batch
+    const multiplier = (mode==="normal") ? 1
+      : (mode==="attackA") ? 3
+      : (mode==="attackB") ? 5
+      : 2;
+
+    const n = baseEvents * multiplier;
+
+    for(let i=0;i<n;i++){
+      const dev = DEVICES[Math.floor(Math.random()*DEVICES.length)];
+
+      let kind = "PUBLISH";
+      if(mode==="attackA"){
+        kind = (Math.random()<0.55) ? "CONNECT" : (Math.random()<0.25) ? "DISCONNECT" : "PUBLISH";
+      } else if(mode==="attackB"){
+        kind = (Math.random()<0.9) ? "PUBLISH" : "CONNECT";
+      } else if(mode==="attackC"){
+        kind = (Math.random()<0.35) ? "AUTH_FAIL" : "PUBLISH";
+      } else {
+        kind = (Math.random()<0.1) ? "CONNECT" : "PUBLISH";
+      }
+
+      const ev = genEvent(kind, dev, mode==="attackC" && kind!=="AUTH_FAIL"
+        ? { topic: "/unauthorized/+" } : {});
+
+      // update per-second counters
+      state.secCounters.events++;
+      if(ev.kind==="CONNECT") state.secCounters.connects++;
+      if(ev.kind==="AUTH_FAIL") state.secCounters.authFails++;
+
+      // device last event
+      const le = document.getElementById("last-"+dev.id);
+      if(le) le.textContent = ev.kind + (ev.kind==="PUBLISH" ? ` (${ev.payloadBytes}B)` : "");
+
+      // render log line
+      const cls = (ev.kind==="AUTH_FAIL") ? "b"
+        : (state.mode!=="normal" && (ev.kind==="CONNECT" || ev.kind==="DISCONNECT")) ? "w"
+        : "a";
+
+      const msg = `${ev.iso}  ${ev.kind.padEnd(10)}  client=${ev.clientId}  topic=${ev.topic}`;
+      pushLog(msg, cls);
+    }
+  }
+
+  function tickSecond(){
+    const nowS = Math.floor(Date.now()/1000);
+    if(nowS === state.lastSecond) return;
+    state.lastSecond = nowS;
+
+    const eps = state.secCounters.events;
+    const cps = state.secCounters.connects;
+    const afs = state.secCounters.authFails;
+
+    const score = computeScore(eps, afs);
+
+    state.historyEps.push(eps); if(state.historyEps.length>60) state.historyEps.shift();
+    state.historyScore.push(score); if(state.historyScore.length>60) state.historyScore.shift();
+
+    els.eps.textContent = eps;
+    els.cps.textContent = cps;
+    els.afs.textContent = afs;
+    els.score.textContent = score.toFixed(2);
+
+    // reset counters
+    state.secCounters = {events:0, connects:0, authFails:0};
+
+    // redraw charts
+    drawSeries(els.c1, state.historyEps, 120);
+    drawSeries(els.c2, state.historyScore.map(x=>Math.round(x*100)), 100);
+
+    // alert line (concept)
+    if(score > 0.75){
+      pushLog(`${nowIso()}  ALERT       anomaly_score=${score.toFixed(2)}  (concept threshold exceeded)`, "b");
+    }
+  }
+
+  // init
+  renderDevices();
+  drawSeries(els.c1, state.historyEps, 120);
+  drawSeries(els.c2, state.historyScore.map(x=>Math.round(x*100)), 100);
+
+  setInterval(() => { generateBatch(); tickSecond(); }, 250);
+</script>
+</body>
+</html>
