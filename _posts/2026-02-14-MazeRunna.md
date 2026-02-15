@@ -23,7 +23,7 @@ image: /assets/img/categories/misc.svg
 
 At first glance this looks like a simple Roblox maze game, but the “something feels off” hint suggests the flag isn’t meant to be earned by gameplay. The fastest path is to inspect the Roblox place file and its scripts.
 
-![Challenge panel](/assets/img/writeup/MazeRunna/1.png)
+![Challenge panel](/assets/file/writeup/MazeRunna/1.png)
 
 ---
 
@@ -31,7 +31,7 @@ At first glance this looks like a simple Roblox maze game, but the “something 
 
 The challenge links to a Roblox experience, and Roblox experiences are backed by a *place* that can be opened in Roblox Studio. Once you can inspect the place content (Explorer / scripts), you can usually spot hardcoded strings, remote events, or decoy values.
 
-![Roblox game page](/assets/img/writeup/MazeRunna/2.png)
+![Roblox game page](/assets/file/writeup/MazeRunna/2.png)
 
 ---
 
@@ -42,12 +42,12 @@ Go to the game page and use **Edit in Studio**:
 
 - https://www.roblox.com/games/75864087736017/MazeRunna
 
-![Roblox game page](/assets/img/writeup/MazeRunna/2.png)
+![Roblox game page](/assets/file/writeup/MazeRunna/2.png)
 
 ### 2) Find the decoy flag
 In Roblox Studio, browse the Explorer and locate the script attached to the flag prompt. The first place version contains a fake flag in the script.
 
-![fake flag in script](/assets/img/writeup/MazeRunna/03.png)
+![fake flag in script](/assets/file/writeup/MazeRunna/3.png)
 
 ### 3) Pull another place version from Asset Delivery
 Since the visible place had a fake flag, the next move is to download another **version** of the same asset using Roblox Asset Delivery:
@@ -56,19 +56,19 @@ Since the visible place had a fake flag, the next move is to download another **
 
 After downloading, you’ll get a file with an unhelpful name.
 
-![Downloaded asset file](/assets/img/writeup/MazeRunna/04.png)
+![Downloaded asset file](/assets/file/writeup/MazeRunna/4.png)
 
 ### 4) Rename to a proper Roblox place file
 Rename the downloaded file to:
 
 - `chall.rbxl`
 
-![Rename to chall.rbxl](/assets/img/writeup/MazeRunna/5.png)
+![Rename to chall.rbxl](/assets/file/writeup/MazeRunna/5.png)
 
 ### 5) Open the new file and re-check the same script path
 Open `chall.rbxl` in Roblox Studio, navigate to the same script location, and the real flag is hardcoded there.
 
-![Real flag in version 2](/assets/img/writeup/MazeRunna/6.png)
+![Real flag in version 2](/assets/file/writeup/MazeRunna/6.png)
 
 
 ---
